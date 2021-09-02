@@ -1,20 +1,18 @@
-Laravel Package
+Laravel SAML
 ---
 
-Laravel package template.
+SAML toolkit for Laravel based on OneLogin's SAML PHP Toolkit.
 
 ## Installing
 
 ```shell
-$ composer require overtrue/laravel-package -vvv
+$ composer require overtrue/laravel-saml -vvv
 ```
 
-### Migrations
-
-This step is also optional, if you want to custom the pivot table, you can publish the migration files:
+### Config
 
 ```php
-$ php artisan vendor:publish --provider="Overtrue\\LaravelPackage\\PackageServiceProvider" --tag=migrations
+$ php artisan vendor:publish --provider="Overtrue\\LaravelSaml\\SamlServiceProvider" 
 ```
 
 ## Usage

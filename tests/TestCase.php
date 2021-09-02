@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Overtrue\LaravelPackage\PackageServiceProvider;
+use Overtrue\LaravelSaml\SamlServiceProvider;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -15,7 +15,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [PackageServiceProvider::class];
+        return [SamlServiceProvider::class];
     }
 
     /**

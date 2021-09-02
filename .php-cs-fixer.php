@@ -14,6 +14,7 @@ return (new PhpCsFixer\Config())
         'no_leading_import_slash' => true,
         'no_whitespace_in_blank_line' => true,
         'no_unused_imports' => true,
+        'array_syntax' => ['syntax' => 'short'],
         'ordered_class_elements' => [
             'order' => [
                 'use_trait',

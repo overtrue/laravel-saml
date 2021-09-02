@@ -1,10 +1,10 @@
 <?php
 
-namespace Overtrue\LaravelPackage;
+namespace Overtrue\LaravelSaml;
 
 use Illuminate\Support\ServiceProvider;
 
-class PackageServiceProvider extends ServiceProvider
+class SamlServiceProvider extends ServiceProvider
 {
     /**
      * Perform post-registration booting of services.
@@ -12,12 +12,8 @@ class PackageServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            \dirname(__DIR__) . '/migrations/' => database_path('migrations'),
-        ], 'migrations');
-
-        if ($this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(\dirname(__DIR__) . '/migrations/');
-        }
+            \dirname(__DIR__) . '/config/' => config_path('saml.php'),
+        ], 'saml-config');
     }
 
     public function register()

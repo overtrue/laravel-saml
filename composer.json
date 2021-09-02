@@ -1,6 +1,6 @@
 {
-    "name": "overtrue/laravel-package",
-    "description": "Laravel package template",
+    "name": "overtrue/laravel-saml",
+    "description": "SAML toolkit for Laravel based on OneLogin's SAML PHP Toolkit.",
     "license": "MIT",
     "authors": [
         {
@@ -9,11 +9,12 @@
         }
     ],
     "require": {
-        "laravel/framework": "^8.0"
+        "laravel/framework": "^8.0",
+        "onelogin/php-saml": "^4.0"
     },
     "autoload": {
         "psr-4": {
-            "Overtrue\\LaravelPackage\\": "src"
+            "Overtrue\\LaravelSaml\\": "src"
         }
     },
     "autoload-dev": {
@@ -31,7 +32,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "\\Overtrue\\LaravelPackage\\PackageServiceProvider"
+                "\\Overtrue\\LaravelSaml\\SamlServiceProvider"
             ]
         },
         "hooks": {
