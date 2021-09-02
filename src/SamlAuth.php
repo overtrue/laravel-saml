@@ -14,7 +14,8 @@ class SamlAuth
 
     public function fromIdp(array $settings)
     {
-        //TODO: Implement fromIdp() method.
+        $settings = array_merge(config('smal'), ['idp' => $settings]);
+
         return new Auth($settings);
     }
 
