@@ -10,7 +10,8 @@
     ],
     "require": {
         "laravel/framework": "^8.0",
-        "onelogin/php-saml": "^4.0"
+        "onelogin/php-saml": "^4.0",
+        "ext-openssl": "*"
     },
     "autoload": {
         "psr-4": {

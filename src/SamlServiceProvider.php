@@ -6,20 +6,21 @@ use Illuminate\Support\ServiceProvider;
 
 class SamlServiceProvider extends ServiceProvider
 {
-    /**
-     * Perform post-registration booting of services.
-     */
     public function boot()
     {
         $this->publishes([
-            \dirname(__DIR__) . '/config/' => config_path('saml.php'),
-        ], 'saml-config');
+             \dirname(__DIR__) . '/config/' => config_path(),
+         ], 'saml-config');
     }
 
     public function register()
     {
-//        $this->app->singleton(Package::class, function(){
-//            return new Package();
-//        });
+        $this->mergeConfigFrom(\dirname(__DIR__) . '/config/saml.php', 'saml');
+
+        $config = \config('saml');
+
+        if (!empty($config['idp'])) {
+            Saml::configureIdpUsing(fn () => $config['idp']);
+        }
     }
 }
