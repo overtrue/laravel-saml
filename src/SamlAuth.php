@@ -77,7 +77,7 @@ class SamlAuth
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
      */
-    public function acs(): RedirectResponse|SamlUser
+    public function acs(bool $redirectToRelayState = false): RedirectResponse|SamlUser
     {
         try {
             $this->auth->processResponse();
@@ -95,11 +95,11 @@ class SamlAuth
             throw new UnauthenticatedException($this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
         }
 
-//        $relayState = $this->request->get('RelayState');
-//
-//        if (!!$relayState && \OneLogin\Saml2\Utils::getSelfURL() != $relayState) {
-//            return new RedirectResponse($relayState);
-//        }
+        $relayState = $this->request->get('RelayState');
+
+        if ($redirectToRelayState && !!$relayState && \OneLogin\Saml2\Utils::getSelfURL() != $relayState) {
+            return new RedirectResponse($relayState);
+        }
 
         return new SamlUser($this->auth);
     }
@@ -137,7 +137,7 @@ class SamlAuth
     /**
      * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
      */
-    public function metadata(): string
+    public function metadata(): Response
     {
         try {
             $settings = $this->auth->getSettings();
@@ -145,7 +145,7 @@ class SamlAuth
             $errors = $settings->validateMetadata($metadata);
 
             if (empty($errors)) {
-                return new Response($metadata, ['Content-Type' => 'text/xml']);
+                return new Response($metadata, 200, ['Content-Type' => 'text/xml']);
             }
 
             throw new InvalidConfigException(
