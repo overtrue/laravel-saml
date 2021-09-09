@@ -5,12 +5,14 @@ namespace Overtrue\LaravelSaml;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Error;
 use Overtrue\LaravelSaml\Exceptions\AssertException;
 use Overtrue\LaravelSaml\Exceptions\MethodNotFoundException;
 use Overtrue\LaravelSaml\Exceptions\UnauthenticatedException;
 use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SamlAuth
 {
@@ -111,7 +113,7 @@ class SamlAuth
      */
     public function sls(string $requestId = null, callable $callback = null, bool $retrieveParametersFromServer = false)
     {
-        $callback = $callback ?? fn () => null;
+        $callback ??= fn () => null;
 
         try {
             $redirectUrl = $this->auth->processSLO(
@@ -158,6 +160,15 @@ class SamlAuth
         }
     }
 
+    public function metadataAsStreamResponse(string $filename = null): StreamedResponse
+    {
+        $filename ??= Str::slug(\config('app.name')).'-metadata.xml';
+
+        return \response()->streamDownload(function () {
+            echo $this->metadata()->getContent();
+        }, $filename);
+    }
+
     public function getAuth(): Auth
     {
         return $this->auth;
@@ -166,8 +177,10 @@ class SamlAuth
     /**
      * @throws \Overtrue\LaravelSaml\Exceptions\MethodNotFoundException
      */
-    public function __call(string $name, array $arguments)
-    {
+    public function __call(
+        string $name,
+        array $arguments
+    ) {
         if (\is_callable([$this->auth, $name])) {
             return \call_user_func_array([$this->auth, $name], $arguments);
         }

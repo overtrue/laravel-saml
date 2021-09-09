@@ -11,6 +11,7 @@ use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
  * @method static \Illuminate\Http\RedirectResponse|\Overtrue\LaravelSaml\SamlUser acs()
  * @method static \Illuminate\Http\RedirectResponse sls()
  * @method static \Illuminate\Http\Response metadata()
+ * @method static \Illuminate\Http\StreamResponse metadataAsStreamResponse()
  * @method static \Overtrue\LaravelSaml\SamlUser getSamlUser()
  */
 class Saml
