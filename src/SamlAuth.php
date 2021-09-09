@@ -77,10 +77,10 @@ class SamlAuth
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
      */
-    public function acs(bool $redirectToRelayState = false): RedirectResponse|SamlUser
+    public function acs(string $requestId = null, bool $redirectToRelayState = false): RedirectResponse|SamlUser
     {
         try {
-            $this->auth->processResponse();
+            $this->auth->processResponse($requestId);
         } catch (\Throwable $e) {
             throw new AssertException($this->auth->getErrors(), $this->auth->getLastErrorReason(), $e);
         }
@@ -109,14 +109,14 @@ class SamlAuth
      *
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      */
-    public function sls(bool $retrieveParametersFromServer = false)
+    public function sls(string $requestId = null, callable $callback = null, bool $retrieveParametersFromServer = false)
     {
-        $callback = fn () => null;
+        $callback = $callback ?? fn () => null;
 
         try {
             $redirectUrl = $this->auth->processSLO(
                 keepLocalSession:             false,
-                requestId:                    null,
+                requestId:                    $requestId,
                 retrieveParametersFromServer: $retrieveParametersFromServer,
                 cbDeleteSession:              $callback,
                 stay:                         true
