@@ -1,7 +1,5 @@
 <?php
 
-use Overtrue\LaravelSaml\Utils;
-
 return [
     // If 'strict' is True, then the PHP Toolkit will reject unsigned
     // or unencrypted messages if it expects them to be signed or encrypted.
@@ -16,12 +14,12 @@ return [
     // the BaseURL of the view that process the SAML Message.
     // Ex http://sp.example.com/
     //    http://example.com/sp/
-    'baseurl' => null,
+    'baseurl' => env('SAML_BASE_URL', '/saml'),
 
     // Service Provider Data that we are deploying.
     'sp' => [
         // Identifier of the SP entity  (must be a URI)
-        'entityId' => '',
+        'entityId' => env('SAML_SP_ENTITYID', ''),
         // Specifies info about where and how the <AuthnResponse> message MUST be
         // returned to the requester, in this case our SP.
         'assertionConsumerService' => [
@@ -64,8 +62,8 @@ return [
         'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
         // Usually x509cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
-        'x509cert' => '',
-        'privateKey' => '',
+        'x509cert' => env('SAML_SP_X509', ''),
+        'privateKey' => env('SAML_SP_PRIVATEKEY', ''),
 
         /*
          * Key rollover
@@ -80,7 +78,7 @@ return [
     // Identity Provider Data that we want connected with our SP.
 //    'idp' => [
 //        // Identifier of the IdP entity  (must be a URI)
-//        'entityId' => '',
+//        'entityId' => env('SAML_IDP_PRIVATEKEY', ''),
 //        // SSO endpoint info of the IdP. (Authentication Request protocol)
 //        'singleSignOnService' => [
 //            // URL Target of the IdP where the Authentication Request Message
@@ -104,7 +102,7 @@ return [
 //            'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
 //        ],
 //        // Public x509 certificate of the IdP
-//        'x509cert' => '',
+//        'x509cert' => env('SAML_IDP_X509', ''),
 //        /*
 //         *  Instead of use the whole x509cert you can use a fingerprint in order to
 //         *  validate a SAMLResponse, but we don't recommend to use that
@@ -138,6 +136,29 @@ return [
 //        //      )
 //        // ),
 //    ],
+
+    // Contact information template, it is recommended to supply a
+    // technical and support contacts.
+    'contactPerson' => [
+        'technical' => [
+            'givenName' => '',
+            'emailAddress' => '',
+        ],
+        'support' => [
+            'givenName' => '',
+            'emailAddress' => '',
+        ],
+    ],
+
+    // Organization information template, the info in en_US lang is
+    // recomended, add more if required.
+    'organization' => [
+        'en-US' => [
+            'name' => '',
+            'displayname' => '',
+            'url' => '',
+        ],
+    ],
 
     // Compression settings
     'compress' => [
@@ -248,28 +269,5 @@ return [
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
         'lowercaseUrlencoding' => false,
-    ],
-
-    // Contact information template, it is recommended to supply a
-    // technical and support contacts.
-    'contactPerson' => [
-        'technical' => [
-            'givenName' => '',
-            'emailAddress' => '',
-        ],
-        'support' => [
-            'givenName' => '',
-            'emailAddress' => '',
-        ],
-    ],
-
-    // Organization information template, the info in en_US lang is
-    // recomended, add more if required.
-    'organization' => [
-        'en-US' => [
-            'name' => '',
-            'displayname' => '',
-            'url' => '',
-        ],
     ],
 ];

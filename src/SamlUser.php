@@ -26,14 +26,15 @@ class SamlUser extends Fluent
     }
 
     #[Pure]
+    public function getNameId(): string
+    {
+        return $this->auth->getNameId();
+    }
+
+    #[Pure]
     public function getAttributesWithFriendlyName(): array
     {
         return $this->auth->getAttributesWithFriendlyName();
-    }
-
-    public function getRawSamlAssertion()
-    {
-        return $this->request->input('SAMLResponse');
     }
 
     public function getIntendedUrl()
@@ -43,6 +44,8 @@ class SamlUser extends Fluent
         if ($relayState && URL::full() != $relayState) {
             return $relayState;
         }
+
+        return null;
     }
 
     public function getSamlAttribute(string $attribute): ?array
@@ -50,35 +53,21 @@ class SamlUser extends Fluent
         return $this->auth->getAttribute($attribute);
     }
 
-    public function parseAttributes($attributes = [])
+    public function parseAttributes($attributes = []): static
     {
         foreach ($attributes as $propertyName => $samlAttribute) {
-            $this->parseUserAttribute($samlAttribute, $propertyName);
-        }
-    }
-
-    public function parseUserAttribute(string $samlAttribute = null, string $propertyName = null): ?array
-    {
-        if (empty($samlAttribute)) {
-            return null;
-        }
-        if (empty($propertyName)) {
-            return $this->auth->getAttribute($samlAttribute);
+            if (!!$propertyName && !!$samlAttribute) {
+                $this->$propertyName = $this->auth->getAttribute($samlAttribute);
+            }
         }
 
-        return $this->$propertyName = $this->auth->getAttribute($samlAttribute);
+        return $this;
     }
 
     #[Pure]
     public function getSessionIndex(): ?string
     {
         return $this->auth->getSessionIndex();
-    }
-
-    #[Pure]
-    public function getNameId(): string
-    {
-        return $this->auth->getNameId();
     }
 
     public function getAuth(): Auth

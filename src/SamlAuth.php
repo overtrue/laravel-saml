@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Error;
 use Overtrue\LaravelSaml\Exceptions\AssertException;
+use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
 use Overtrue\LaravelSaml\Exceptions\MethodNotFoundException;
 use Overtrue\LaravelSaml\Exceptions\UnauthenticatedException;
-use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SamlAuth
@@ -34,17 +34,19 @@ class SamlAuth
         bool $setNameIdPolicy = true,
         string $nameIdValueReq = null
     ): RedirectResponse {
-        return new RedirectResponse(
-            $this->auth->login(
-                returnTo:        $returnTo,
-                parameters:      $parameters,
-                forceAuthn:      $forceAuthn,
-                isPassive:       $isPassive,
-                stay:            true,
-                setNameIdPolicy: $setNameIdPolicy,
-                nameIdValueReq:  $nameIdValueReq
-            )
+        $redirectUrl = $this->auth->login(
+            returnTo:        $returnTo,
+            parameters:      $parameters,
+            forceAuthn:      $forceAuthn,
+            isPassive:       $isPassive,
+            stay:            true,
+            setNameIdPolicy: $setNameIdPolicy,
+            nameIdValueReq:  $nameIdValueReq
         );
+
+        \session(['saml.authnRequestId' => $this->auth->getLastRequestID()]);
+
+        return new RedirectResponse($redirectUrl);
     }
 
     /**
@@ -59,18 +61,20 @@ class SamlAuth
         string $nameIdNameQualifier = null,
         string $nameIdSPNameQualifier = null
     ): RedirectResponse {
-        return new RedirectResponse(
-            $this->auth->logout(
-                returnTo:              $returnTo,
-                parameters:            $parameters,
-                nameId:                $nameId,
-                sessionIndex:          $sessionIndex,
-                stay:                  true,
-                nameIdFormat:          $nameIdFormat,
-                nameIdNameQualifier:   $nameIdNameQualifier,
-                nameIdSPNameQualifier: $nameIdSPNameQualifier
-            )
+        $redirectUrl = $this->auth->logout(
+            returnTo:              $returnTo,
+            parameters:            $parameters,
+            nameId:                $nameId,
+            sessionIndex:          $sessionIndex,
+            stay:                  true,
+            nameIdFormat:          $nameIdFormat,
+            nameIdNameQualifier:   $nameIdNameQualifier,
+            nameIdSPNameQualifier: $nameIdSPNameQualifier
         );
+
+        \session(['saml.logoutRequestId' => $this->auth->getLastRequestID()]);
+
+        return new RedirectResponse($redirectUrl);
     }
 
     /**
@@ -79,29 +83,9 @@ class SamlAuth
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
      */
-    public function acs(string $requestId = null, bool $redirectToRelayState = false): RedirectResponse|SamlUser
+    public function getAuthenticatedUser(): SamlUser
     {
-        try {
-            $this->auth->processResponse($requestId);
-        } catch (\Throwable $e) {
-            throw new AssertException($this->auth->getErrors(), $this->auth->getLastErrorReason(), $e);
-        }
-
-        $errors = $this->auth->getErrors();
-
-        if (!empty($errors)) {
-            throw new AssertException($errors, $this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
-        }
-
-        if (!$this->auth->isAuthenticated()) {
-            throw new UnauthenticatedException($this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
-        }
-
-        $relayState = $this->request->get('RelayState');
-
-        if ($redirectToRelayState && !!$relayState && \OneLogin\Saml2\Utils::getSelfURL() != $relayState) {
-            return new RedirectResponse($relayState);
-        }
+        $this->validateAuthentication();
 
         return new SamlUser($this->auth);
     }
@@ -111,14 +95,14 @@ class SamlAuth
      *
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      */
-    public function sls(string $requestId = null, callable $callback = null, bool $retrieveParametersFromServer = false)
+    public function handleLogoutRequest(callable $callback = null, bool $retrieveParametersFromServer = false)
     {
         $callback ??= fn () => null;
 
         try {
             $redirectUrl = $this->auth->processSLO(
                 keepLocalSession:             false,
-                requestId:                    $requestId,
+                requestId:                    \session('saml.logoutRequestId'),
                 retrieveParametersFromServer: $retrieveParametersFromServer,
                 cbDeleteSession:              $callback,
                 stay:                         true
@@ -133,13 +117,15 @@ class SamlAuth
             throw new AssertException($errors, $this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
         }
 
+        \session()->forget('saml.logoutRequestId');
+
         return null;
     }
 
     /**
      * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
      */
-    public function metadata(): Response
+    public function getMetadataXML(): Response
     {
         try {
             $settings = $this->auth->getSettings();
@@ -160,12 +146,12 @@ class SamlAuth
         }
     }
 
-    public function metadataAsStreamResponse(string $filename = null): StreamedResponse
+    public function getMetadataXMLAsStreamResponse(string $filename = null): StreamedResponse
     {
-        $filename ??= Str::slug(\config('app.name')).'-metadata.xml';
+        $filename ??= Str::slug(\config('app.name')) . '-metadata.xml';
 
         return \response()->streamDownload(function () {
-            echo $this->metadata()->getContent();
+            echo $this->getMetadataXML()->getContent();
         }, $filename);
     }
 
@@ -186,5 +172,28 @@ class SamlAuth
         }
 
         throw new MethodNotFoundException(\sprintf('Method "%s" not found.', $name));
+    }
+
+    /**
+     * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
+     * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
+     */
+    protected function validateAuthentication(): void
+    {
+        try {
+            $this->auth->processResponse(\session('saml.authnRequestId'));
+        } catch (\Throwable $e) {
+            throw new AssertException($this->auth->getErrors(), $this->auth->getLastErrorReason(), $e);
+        }
+
+        $errors = $this->auth->getErrors();
+
+        if (!empty($errors)) {
+            throw new AssertException($errors, $this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
+        }
+
+        if (!$this->auth->isAuthenticated()) {
+            throw new UnauthenticatedException($this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
+        }
     }
 }

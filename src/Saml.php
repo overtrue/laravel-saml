@@ -8,11 +8,10 @@ use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
 /**
  * @method static \Illuminate\Http\RedirectResponse redirect()
  * @method static \Illuminate\Http\RedirectResponse redirectToLogout()
- * @method static \Illuminate\Http\RedirectResponse|\Overtrue\LaravelSaml\SamlUser acs()
- * @method static \Illuminate\Http\RedirectResponse sls()
- * @method static \Illuminate\Http\Response metadata()
- * @method static \Illuminate\Http\StreamResponse metadataAsStreamResponse()
- * @method static \Overtrue\LaravelSaml\SamlUser getSamlUser()
+ * @method static \Overtrue\LaravelSaml\SamlUser getAuthenticatedUser()
+ * @method static \Illuminate\Http\RedirectResponse handleLogoutRequest()
+ * @method static \Illuminate\Http\Response getMetadataXML()
+ * @method static \Symfony\Component\HttpFoundation\StreamedResponse getMetadataXMLAsStreamResponse()
  */
 class Saml
 {
@@ -25,7 +24,7 @@ class Saml
      * @throws \OneLogin\Saml2\Error
      * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
      */
-    public static function fromIdp(string $idpName, ?array $settings = null): SamlAuth
+    public static function idp(?string $idpName = self::DEFAULT_IDP_NAME, ?array $settings = null): SamlAuth
     {
         if (!isset(self::$resolved[$idpName])) {
             $idpConfig = $settings ?? \call_user_func(self::$idpConfigResolver);
