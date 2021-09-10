@@ -66,11 +66,11 @@ Then configure the routes at `routes/web.php`:
 
 | Method | URI                      | Name 				|
 | -------|--------------------------|------------------ |
-| GET    | {routesPrefix}/login     | saml.login 		|
-| POST   | {routesPrefix}/acs       | saml.acs 			|
-| GET    | {routesPrefix}/logout    | saml.logout 		|
-| GET    | {routesPrefix}/sls       | saml.sls 			|
-| GET    | {routesPrefix}/metadata  | saml.metadata 	|
+| GET    | `{routesPrefix}/login`     | saml.login 		|
+| POST   | `{routesPrefix}/acs`       | saml.acs 			|
+| GET    | `{routesPrefix}/logout`    | saml.logout 		|
+| GET    | `{routesPrefix}/sls`       | saml.sls 			|
+| GET    | `{routesPrefix}/metadata`  | saml.metadata 	|
 
 You are free to use your preferred routing prefix, for example, we use `saml` as the routing prefix:
 

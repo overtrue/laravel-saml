@@ -178,7 +178,7 @@ class SamlAuth
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
      */
-    protected function validateAuthentication(): void
+    public function validateAuthentication(): void
     {
         try {
             $this->auth->processResponse(\session('saml.authnRequestId'));
