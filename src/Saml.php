@@ -18,8 +18,8 @@ class Saml
 {
     public const DEFAULT_IDP_NAME = 'default';
 
-    protected static array $resolved;
-    protected static \Closure $idpConfigResolver;
+    protected static array $resolved = [];
+    protected static ?\Closure $idpConfigResolver = null;
 
     /**
      * @throws \OneLogin\Saml2\Error
@@ -28,7 +28,7 @@ class Saml
     public static function idp(?string $idpName = self::DEFAULT_IDP_NAME, ?array $settings = null): SamlAuth
     {
         if (!isset(self::$resolved[$idpName])) {
-            $idpConfig = $settings ?? \call_user_func(self::$idpConfigResolver);
+            $idpConfig = $settings ?? self::$idpConfigResolver ? \call_user_func(self::$idpConfigResolver, $idpName) : null;
 
             if (!\is_array($idpConfig) || empty($idpConfig)) {
                 throw new InvalidConfigException('Cannot resolve idp config from resolver.');
