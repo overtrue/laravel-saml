@@ -8,6 +8,13 @@ use Illuminate\Support\Fluent;
 use JetBrains\PhpStorm\Pure;
 use OneLogin\Saml2\Auth;
 
+/**
+ * @method string getNameIdFormat()
+ * @method string getNameIdNameQualifier()
+ * @method string getNameIdSPNameQualifier()
+ * @method array|null getAttributeWithFriendlyName($friendlyName)
+ * @method array|null getAttributesWithFriendlyName()
+ */
 class SamlUser extends Fluent
 {
     protected Request $request;
@@ -22,19 +29,7 @@ class SamlUser extends Fluent
     #[Pure]
     public function getUserId(): string
     {
-        return $this->getNameId();
-    }
-
-    #[Pure]
-    public function getNameId(): string
-    {
         return $this->auth->getNameId();
-    }
-
-    #[Pure]
-    public function getAttributesWithFriendlyName(): array
-    {
-        return $this->auth->getAttributesWithFriendlyName();
     }
 
     public function getIntendedUrl()
@@ -56,9 +51,7 @@ class SamlUser extends Fluent
     public function parseAttributes($attributes = []): static
     {
         foreach ($attributes as $propertyName => $samlAttribute) {
-            if (!!$propertyName && !!$samlAttribute) {
-                $this->$propertyName = $this->auth->getAttribute($samlAttribute);
-            }
+            $this->$propertyName = $this->auth->getAttribute($propertyName);
         }
 
         return $this;
@@ -73,5 +66,10 @@ class SamlUser extends Fluent
     public function getAuth(): Auth
     {
         return $this->auth;
+    }
+
+    public function __call($method, $parameters)
+    {
+        return \call_user_func_array([$this->auth, $method], $parameters);
     }
 }
