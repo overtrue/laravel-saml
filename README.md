@@ -169,15 +169,13 @@ This code will provide the XML metadata file of our SP, based on the info that w
     //<...>
     public function metadata(Request $request)
     {
-        $auth = Saml::idp($idpName);
-        
         if ($request->has('download')) {
-            return $auth->getMetadataXMLAsStreamResponse();
+            return Saml::getMetadataXMLAsStreamResponse();
             // or specify a filename to the xml file:
-            // return $auth->getMetadataXMLAsStreamResponse('sp-metadata.xml');
+            // return Saml::getMetadataXMLAsStreamResponse('sp-metadata.xml');
         }
         
-        return $auth->getMetadataXML();
+        return Saml::getMetadataXML();
     }
 ```
 

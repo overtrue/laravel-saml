@@ -2,8 +2,13 @@
 
 namespace Overtrue\LaravelSaml;
 
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Error;
+use OneLogin\Saml2\Settings;
 use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @method static void validateAuthentication()
@@ -54,6 +59,38 @@ class Saml
     public static function __callStatic(string $name, array $arguments)
     {
         return \call_user_func_array([self::idp(self::DEFAULT_IDP_NAME), $name], $arguments);
+    }
+
+    /**
+     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
+     */
+    public static function getMetadataXML(): Response
+    {
+        try {
+            $settings = new Settings(\config('saml'), true);
+            $metadata = $settings->getSPMetadata();
+            $errors = $settings->validateMetadata($metadata);
+
+            if (empty($errors)) {
+                return new Response($metadata, 200, ['Content-Type' => 'text/xml']);
+            }
+
+            throw new InvalidConfigException(
+                sprintf('Invalid SP metadata: %s', implode(', ', $errors)),
+                Error::METADATA_SP_INVALID,
+            );
+        } catch (\Throwable $e) {
+            throw new InvalidConfigException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    public static function getMetadataXMLAsStreamResponse(string $filename = null): StreamedResponse
+    {
+        $filename ??= Str::slug(\config('app.name')) . '-metadata.xml';
+
+        return \response()->streamDownload(function () {
+            echo static::getMetadataXML()->getContent();
+        }, $filename);
     }
 
     /**
