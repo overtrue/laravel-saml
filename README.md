@@ -1,7 +1,7 @@
 Laravel SAML
 ---
 
-SAML toolkit for Laravel based on OneLogin's SAML PHP Toolkit.
+SAML toolkit for Laravel based on [OneLogin's SAML PHP Toolkit](https://github.com/onelogin/php-saml).
 
 [![Sponsor me](https://github.com/overtrue/overtrue/blob/master/sponsor-me-button-s.svg?raw=true)](https://github.com/sponsors/overtrue)
 
