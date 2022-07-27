@@ -19,12 +19,12 @@ return [
     // Service Provider Data that we are deploying.
     'sp' => [
         // Identifier of the SP entity  (must be a URI)
-        'entityId' => env('SAML_SP_ENTITYID', url('/')),
+        'entityId' => env('SAML_SP_ENTITYID', 'https://sp.example.com/saml'),
         // Specifies info about where and how the <AuthnResponse> message MUST be
         // returned to the requester, in this case our SP.
         'assertionConsumerService' => [
             // URL Location where the <Response> from the IdP will be returned
-            'url' => env('SAML_SP_ACS_URL', url('saml/acs')),
+            'url' => env('SAML_SP_ACS_URL', 'https://sp.example.com/saml/acs'),
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports this endpoint for the
             // HTTP-POST binding only.
@@ -50,7 +50,7 @@ return [
         // returned to the requester, in this case our SP.
         'singleLogoutService' => [
             // URL Location where the <Response> from the IdP will be returned
-            'url' => env('SAML_SP_SLS_URL', url('saml/sls')),
+            'url' => env('SAML_SP_SLS_URL', 'https://sp.example.com/saml/logout'),
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.
@@ -78,12 +78,12 @@ return [
     // Identity Provider Data that we want connected with our SP.
     // 'idp' => [
     //     // Identifier of the IdP entity  (must be a URI)
-    //     'entityId' => env('SAML_IDP_PRIVATEKEY', url('')),
+    //     'entityId' => env('SAML_IDP_PRIVATEKEY'),
     //     // SSO endpoint info of the IdP. (Authentication Request protocol)
     //     'singleSignOnService' => [
     //         // URL Target of the IdP where the Authentication Request Message
     //         // will be sent.
-    //         'url' => env('SAML_IDP_SSO_URL', url('saml/idp/sso')),
+    //         'url' => env('SAML_IDP_SSO_URL', 'https://idp.example.com/idp/profile/SAML2/Redirect/SSO'),
     //         // SAML protocol binding to be used when returning the <Response>
     //         // message. OneLogin Toolkit supports the HTTP-Redirect binding
     //         // only for this endpoint.
@@ -92,7 +92,7 @@ return [
     //     // SLO endpoint info of the IdP.
     //     'singleLogoutService' => [
     //         // URL Location of the IdP where SLO Request will be sent.
-    //         'url' => env('SAML_IDP_SLS_URL', url('saml/idp/sls')),
+    //         'url' => env('SAML_IDP_SLS_URL', 'https://idp.example.com/idp/profile/SAML2/Redirect/SLO'),
     //         // URL location of the IdP where the SP will send the SLO Response (ResponseLocation)
     //         // if not set, url for the SLO Request will be used
     //         'responseUrl' => '',
@@ -156,7 +156,7 @@ return [
         'en-US' => [
             'name' => 'Saml',
             'displayname' => 'Saml',
-            'url' => url('/'),
+            'url' => 'http://example.com',
         ],
     ],
 
