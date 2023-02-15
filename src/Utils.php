@@ -12,7 +12,7 @@ class Utils
      */
     public static function loadKeyFromFile(string $path)
     {
-        if (!\file_exists($path)) {
+        if (! \file_exists($path)) {
             throw new InvalidConfigException("Private key file '{$path}' not exists.");
         }
 
@@ -32,7 +32,7 @@ class Utils
      */
     public static function loadCertFromFile(string $path)
     {
-        if (!\file_exists($path)) {
+        if (! \file_exists($path)) {
             throw new InvalidConfigException("X509 certificate file '{$path}' not exists.");
         }
 
@@ -49,9 +49,9 @@ class Utils
 
     public static function extractOpensslString($contents, $delimiter)
     {
-        $contents = str_replace(["\r", "\n"], "", $contents);
+        $contents = str_replace(["\r", "\n"], '', $contents);
 
-        $regex = '/-{5}BEGIN(?:\s|\w)+' . $delimiter . '-{5}\s*(.+?)\s*-{5}END(?:\s|\w)+' . $delimiter . '-{5}/m';
+        $regex = '/-{5}BEGIN(?:\s|\w)+'.$delimiter.'-{5}\s*(.+?)\s*-{5}END(?:\s|\w)+'.$delimiter.'-{5}/m';
 
         preg_match($regex, $contents, $matches);
 

@@ -5,15 +5,10 @@ namespace Overtrue\LaravelSaml;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 use OneLogin\Saml2\Auth;
-use OneLogin\Saml2\Error;
-use OneLogin\Saml2\Settings;
 use Overtrue\LaravelSaml\Exceptions\AssertException;
-use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
 use Overtrue\LaravelSaml\Exceptions\MethodNotFoundException;
 use Overtrue\LaravelSaml\Exceptions\UnauthenticatedException;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SamlAuth
 {
@@ -114,7 +109,7 @@ class SamlAuth
 
         $errors = $this->auth->getErrors();
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             throw new AssertException($errors, $this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
         }
 
@@ -156,11 +151,11 @@ class SamlAuth
 
         $errors = $this->auth->getErrors();
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             throw new AssertException($errors, $this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
         }
 
-        if (!$this->auth->isAuthenticated()) {
+        if (! $this->auth->isAuthenticated()) {
             throw new UnauthenticatedException($this->auth->getLastErrorReason(), $this->auth->getLastErrorException());
         }
     }

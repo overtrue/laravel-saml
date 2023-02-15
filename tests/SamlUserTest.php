@@ -63,8 +63,8 @@ class SamlUserTest extends TestCase
         $auth->expects()->getAttributes()->andReturns([]);
 
         \request()->merge([
-                              'RelayState' => 'http://foobar.com/saml/user',
-                          ]);
+            'RelayState' => 'http://foobar.com/saml/user',
+        ]);
 
         $this->assertSame('http://foobar.com/saml/user', (new SamlUser($auth))->getIntendedUrl());
     }

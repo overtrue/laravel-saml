@@ -33,16 +33,16 @@ return [
         // If you need to specify requested attributes, set a
         // attributeConsumingService. nameFormat, attributeValue and
         // friendlyName can be omitted
-        "attributeConsumingService" => [
-            "serviceName" => "SP test",
-            "serviceDescription" => "Test Service",
-            "requestedAttributes" => [
+        'attributeConsumingService' => [
+            'serviceName' => 'SP test',
+            'serviceDescription' => 'Test Service',
+            'requestedAttributes' => [
                 [
-                    "name" => "",
-                    "isRequired" => false,
-                    "nameFormat" => "",
-                    "friendlyName" => "",
-                    "attributeValue" => [],
+                    'name' => '',
+                    'isRequired' => false,
+                    'nameFormat' => '',
+                    'friendlyName' => '',
+                    'attributeValue' => [],
                 ],
             ],
         ],

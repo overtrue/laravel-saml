@@ -24,6 +24,7 @@ class Saml
     public const DEFAULT_IDP_NAME = 'default';
 
     protected static array $resolved = [];
+
     protected static ?\Closure $idpConfigResolver = null;
 
     /**
@@ -32,10 +33,10 @@ class Saml
      */
     public static function idp(?string $idpName = self::DEFAULT_IDP_NAME, ?array $settings = null): SamlAuth
     {
-        if (!isset(self::$resolved[$idpName])) {
+        if (! isset(self::$resolved[$idpName])) {
             $idpConfig = $settings ?? self::$idpConfigResolver ? \call_user_func(self::$idpConfigResolver, $idpName) : null;
 
-            if (!\is_array($idpConfig) || empty($idpConfig)) {
+            if (! \is_array($idpConfig) || empty($idpConfig)) {
                 throw new InvalidConfigException('Cannot resolve idp config from resolver.');
             }
 
@@ -86,7 +87,7 @@ class Saml
 
     public static function getMetadataXMLAsStreamResponse(string $filename = null): StreamedResponse
     {
-        $filename ??= Str::slug(\config('app.name')) . '-metadata.xml';
+        $filename ??= Str::slug(\config('app.name')).'-metadata.xml';
 
         return \response()->streamDownload(function () {
             echo static::getMetadataXML()->getContent();
@@ -106,7 +107,7 @@ class Saml
             throw new InvalidConfigException('Please configure the "saml.sp.assertionConsumerService.url".');
         }
 
-        if (!empty($config['sp']['singleLogoutService']) && empty($config['sp']['singleLogoutService']['url'])) {
+        if (! empty($config['sp']['singleLogoutService']) && empty($config['sp']['singleLogoutService']['url'])) {
             throw new InvalidConfigException('Please configure the "saml.sp.singleLogoutService.url".');
         }
 
