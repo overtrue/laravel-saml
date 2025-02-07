@@ -7,7 +7,7 @@ use Overtrue\LaravelSaml\SamlUser;
 
 class SamlUserTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         \Mockery::close();
     }

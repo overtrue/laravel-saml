@@ -23,21 +23,21 @@ class SamlAuth
      * @throws \OneLogin\Saml2\Error
      */
     public function redirect(
-        string $returnTo = null,
+        ?string $returnTo = null,
         array $parameters = [],
         bool $forceAuthn = false,
         bool $isPassive = false,
         bool $setNameIdPolicy = true,
-        string $nameIdValueReq = null
+        ?string $nameIdValueReq = null
     ): RedirectResponse {
         $redirectUrl = $this->auth->login(
-            returnTo:        $returnTo,
-            parameters:      $parameters,
-            forceAuthn:      $forceAuthn,
-            isPassive:       $isPassive,
-            stay:            true,
+            returnTo: $returnTo,
+            parameters: $parameters,
+            forceAuthn: $forceAuthn,
+            isPassive: $isPassive,
+            stay: true,
             setNameIdPolicy: $setNameIdPolicy,
-            nameIdValueReq:  $nameIdValueReq
+            nameIdValueReq: $nameIdValueReq
         );
 
         \session(['saml.authnRequestId' => $this->auth->getLastRequestID()]);
@@ -49,22 +49,22 @@ class SamlAuth
      * @throws \OneLogin\Saml2\Error
      */
     public function redirectToLogout(
-        string $returnTo = null,
+        ?string $returnTo = null,
         array $parameters = [],
-        string $nameId = null,
-        string $sessionIndex = null,
-        string $nameIdFormat = null,
-        string $nameIdNameQualifier = null,
-        string $nameIdSPNameQualifier = null
+        ?string $nameId = null,
+        ?string $sessionIndex = null,
+        ?string $nameIdFormat = null,
+        ?string $nameIdNameQualifier = null,
+        ?string $nameIdSPNameQualifier = null
     ): RedirectResponse {
         $redirectUrl = $this->auth->logout(
-            returnTo:              $returnTo,
-            parameters:            $parameters,
-            nameId:                $nameId,
-            sessionIndex:          $sessionIndex,
-            stay:                  true,
-            nameIdFormat:          $nameIdFormat,
-            nameIdNameQualifier:   $nameIdNameQualifier,
+            returnTo: $returnTo,
+            parameters: $parameters,
+            nameId: $nameId,
+            sessionIndex: $sessionIndex,
+            stay: true,
+            nameIdFormat: $nameIdFormat,
+            nameIdNameQualifier: $nameIdNameQualifier,
             nameIdSPNameQualifier: $nameIdSPNameQualifier
         );
 
@@ -91,17 +91,17 @@ class SamlAuth
      *
      * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
      */
-    public function handleLogoutRequest(callable $callback = null, bool $retrieveParametersFromServer = false)
+    public function handleLogoutRequest(?callable $callback = null, bool $retrieveParametersFromServer = false)
     {
         $callback ??= fn () => null;
 
         try {
             $redirectUrl = $this->auth->processSLO(
-                keepLocalSession:             false,
-                requestId:                    \session('saml.logoutRequestId'),
+                keepLocalSession: false,
+                requestId: \session('saml.logoutRequestId'),
                 retrieveParametersFromServer: $retrieveParametersFromServer,
-                cbDeleteSession:              $callback,
-                stay:                         true
+                cbDeleteSession: $callback,
+                stay: true
             );
         } catch (\Throwable $e) {
             throw new AssertException($this->auth->getErrors(), $this->auth->getLastErrorReason(), $e);

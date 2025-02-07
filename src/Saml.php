@@ -85,7 +85,7 @@ class Saml
         }
     }
 
-    public static function getMetadataXMLAsStreamResponse(string $filename = null): StreamedResponse
+    public static function getMetadataXMLAsStreamResponse(?string $filename = null): StreamedResponse
     {
         $filename ??= Str::slug(\config('app.name')).'-metadata.xml';
 

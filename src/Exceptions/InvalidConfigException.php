@@ -2,6 +2,4 @@
 
 namespace Overtrue\LaravelSaml\Exceptions;
 
-class InvalidConfigException extends Exception
-{
-}
+class InvalidConfigException extends Exception {}
