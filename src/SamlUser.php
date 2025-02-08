@@ -19,7 +19,7 @@ class SamlUser extends Fluent
 {
     protected Request $request;
 
-    public function __construct(protected Auth $auth, Request $request = null)
+    public function __construct(protected Auth $auth, ?Request $request = null)
     {
         parent::__construct();
         $this->request = $request ?? \request();

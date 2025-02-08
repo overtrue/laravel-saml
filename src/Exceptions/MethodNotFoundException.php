@@ -2,6 +2,4 @@
 
 namespace Overtrue\LaravelSaml\Exceptions;
 
-class MethodNotFoundException extends Exception
-{
-}
+class MethodNotFoundException extends Exception {}
