@@ -3,6 +3,7 @@
 namespace Tests;
 
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Utils;
 use Overtrue\LaravelSaml\Exceptions\AssertException;
 use Overtrue\LaravelSaml\Saml;
 use Overtrue\LaravelSaml\SamlAuth;
@@ -41,20 +42,65 @@ class FeatureTest extends TestCase
         $this->assertResponseRejected($this->unsignedResponse('other-request'), 'does not match the ID of the AuthNRequest');
     }
 
-    private function createAuth(): Auth
+    public function test_signed_response_authenticates_with_real_toolkit(): void
+    {
+        [$response, $certificate] = $this->signedResponse();
+
+        $this->withResponse($response, function () use ($certificate) {
+            $user = (new SamlAuth($this->createAuth($certificate)))->getAuthenticatedUser();
+
+            $this->assertSame('user@example.com', $user->getUserId());
+            $this->assertSame('session-index', $user->getSessionIndex());
+        });
+    }
+
+    public function test_tampered_signed_response_is_rejected_by_real_toolkit(): void
+    {
+        [$response, $certificate] = $this->signedResponse();
+        $response = str_replace('user@example.com', 'attacker@example.com', $response);
+
+        $this->assertResponseRejected($response, 'Reference validation failed', $certificate);
+    }
+
+    private function signedResponse(): array
+    {
+        // Generate a throwaway key pair so no private signing key is stored in the repository.
+        $key = openssl_pkey_new(['private_key_bits' => 2048]);
+        $request = openssl_csr_new(['commonName' => 'idp.example.com'], $key);
+        $certificate = openssl_csr_sign($request, null, $key, 1);
+        openssl_pkey_export($key, $privateKey);
+        openssl_x509_export($certificate, $publicCertificate);
+
+        return [Utils::addSign($this->unsignedResponse('authn-request'), $privateKey, $publicCertificate), $publicCertificate];
+    }
+
+    private function createAuth(?string $certificate = null): Auth
     {
         $config = config('saml');
         $config['debug'] = false;
         $config['idp'] = [
             'entityId' => 'https://idp.example.com/saml',
             'singleSignOnService' => ['url' => 'https://idp.example.com/login'],
-            'x509cert' => __DIR__.'/fixtures/idp.crt',
+            'x509cert' => $certificate ?? __DIR__.'/fixtures/idp.crt',
         ];
 
         return new Auth(Saml::normalizeConfig($config));
     }
 
-    private function assertResponseRejected(string $response, string $reason): void
+    private function assertResponseRejected(string $response, string $reason, ?string $certificate = null): void
+    {
+        $this->withResponse($response, function () use ($reason, $certificate) {
+            try {
+                (new SamlAuth($this->createAuth($certificate)))->getAuthenticatedUser();
+                $this->fail('An invalid SAML response must not authenticate.');
+            } catch (AssertException $exception) {
+                $this->assertSame(['invalid_response'], $exception->errors);
+                $this->assertStringContainsString($reason, $exception->lastErrorReason);
+            }
+        });
+    }
+
+    private function withResponse(string $response, callable $callback): void
     {
         $post = $_POST;
         $server = $_SERVER;
@@ -67,11 +113,7 @@ class FeatureTest extends TestCase
             $_SERVER['REQUEST_URI'] = '/saml/acs';
             session(['saml.authnRequestId' => 'authn-request']);
 
-            (new SamlAuth($this->createAuth()))->getAuthenticatedUser();
-            $this->fail('An invalid SAML response must not authenticate.');
-        } catch (AssertException $exception) {
-            $this->assertSame(['invalid_response'], $exception->errors);
-            $this->assertStringContainsString($reason, $exception->lastErrorReason);
+            $callback();
         } finally {
             $_POST = $post;
             $_SERVER = $server;

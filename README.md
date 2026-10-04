@@ -28,6 +28,8 @@ composer require overtrue/laravel-saml:^2.0 --with-all-dependencies
 
 This major release raises the supported platform baseline. Existing SAML APIs and configuration keys are unchanged; keep your IdP certificates, strict validation, signing requirements, and application-specific ACS/SLS routes and middleware intact. Test login, assertion validation, and logout against your IdP after upgrading.
 
+The release also fixes explicitly supplied IdP settings being ignored and preserves the original PHP error when SAML response or logout processing fails.
+
 For package development, the test suite now uses Orchestra Testbench 11 and PHPUnit 12.5. CI runs on PHP 8.3, 8.4, and 8.5, including the lowest dependency versions allowed by Composer's security checks.
 
 ## Configuration
