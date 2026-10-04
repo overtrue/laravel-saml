@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Error;
 use Overtrue\LaravelSaml\Exceptions\AssertException;
 use Overtrue\LaravelSaml\Exceptions\MethodNotFoundException;
 use Overtrue\LaravelSaml\Exceptions\UnauthenticatedException;
@@ -20,7 +21,7 @@ class SamlAuth
     }
 
     /**
-     * @throws \OneLogin\Saml2\Error
+     * @throws Error
      */
     public function redirect(
         ?string $returnTo = null,
@@ -46,7 +47,7 @@ class SamlAuth
     }
 
     /**
-     * @throws \OneLogin\Saml2\Error
+     * @throws Error
      */
     public function redirectToLogout(
         ?string $returnTo = null,
@@ -76,8 +77,8 @@ class SamlAuth
     /**
      * Assertion Consumer Service. Processes the SAML Responses.
      *
-     * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
-     * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
+     * @throws AssertException
+     * @throws UnauthenticatedException
      */
     public function getAuthenticatedUser(): SamlUser
     {
@@ -89,7 +90,7 @@ class SamlAuth
     /**
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
-     * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
+     * @throws AssertException
      */
     public function handleLogoutRequest(?callable $callback = null, bool $retrieveParametersFromServer = false)
     {
@@ -124,7 +125,7 @@ class SamlAuth
     }
 
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\MethodNotFoundException
+     * @throws MethodNotFoundException
      */
     public function __call(
         string $name,
@@ -138,8 +139,8 @@ class SamlAuth
     }
 
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\AssertException
-     * @throws \Overtrue\LaravelSaml\Exceptions\UnauthenticatedException
+     * @throws AssertException
+     * @throws UnauthenticatedException
      */
     public function validateAuthentication(): void
     {
