@@ -7,11 +7,6 @@ use Overtrue\LaravelSaml\SamlUser;
 
 class SamlUserTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        \Mockery::close();
-    }
-
     public function test_get_user_id()
     {
         $auth = \Mockery::mock(Auth::class);

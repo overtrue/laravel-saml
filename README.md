@@ -5,11 +5,30 @@ SAML toolkit for Laravel based on [OneLogin's SAML PHP Toolkit](https://github.c
 
 [![Sponsor me](https://github.com/overtrue/overtrue/blob/master/sponsor-me-button-s.svg?raw=true)](https://github.com/sponsors/overtrue)
 
+## Requirements
+
+- PHP 8.3 or later
+- Laravel 13
+
+Version 2.x supports Laravel 13 only. Applications on Laravel 9–12 should remain on the 1.x release line until they upgrade Laravel.
+
 ## Installation
 
 ```bash
-composer require overtrue/laravel-saml
+composer require overtrue/laravel-saml:^2.0
 ```
+
+## Upgrading from 1.x
+
+Upgrade your application to PHP 8.3+ and Laravel 13 first, then run:
+
+```bash
+composer require overtrue/laravel-saml:^2.0 --with-all-dependencies
+```
+
+This major release raises the supported platform baseline. Existing SAML APIs and configuration keys are unchanged; keep your IdP certificates, strict validation, signing requirements, and application-specific ACS/SLS routes and middleware intact. Test login, assertion validation, and logout against your IdP after upgrading.
+
+For package development, the test suite now uses Orchestra Testbench 11 and PHPUnit 12.5. CI runs on PHP 8.3, 8.4, and 8.5, including the lowest dependency versions allowed by Composer's security checks.
 
 ## Configuration
 

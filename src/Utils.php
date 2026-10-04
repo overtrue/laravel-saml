@@ -8,7 +8,7 @@ use Overtrue\LaravelSaml\Exceptions\InvalidConfigException;
 class Utils
 {
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public static function loadKeyFromFile(string $path)
     {
@@ -28,7 +28,7 @@ class Utils
     }
 
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public static function loadCertFromFile(string $path)
     {

@@ -28,8 +28,8 @@ class Saml
     protected static ?\Closure $idpConfigResolver = null;
 
     /**
-     * @throws \OneLogin\Saml2\Error
-     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
+     * @throws Error
+     * @throws InvalidConfigException
      */
     public static function idp(?string $idpName = self::DEFAULT_IDP_NAME, ?array $settings = null): SamlAuth
     {
@@ -54,8 +54,8 @@ class Saml
     }
 
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
-     * @throws \OneLogin\Saml2\Error
+     * @throws InvalidConfigException
+     * @throws Error
      */
     public static function __callStatic(string $name, array $arguments)
     {
@@ -63,7 +63,7 @@ class Saml
     }
 
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public static function getMetadataXML(): Response
     {
@@ -95,7 +95,7 @@ class Saml
     }
 
     /**
-     * @throws \Overtrue\LaravelSaml\Exceptions\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public static function normalizeConfig(array $config): array
     {
