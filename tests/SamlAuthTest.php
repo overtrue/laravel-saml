@@ -89,6 +89,41 @@ class SamlAuthTest extends TestCase
         }
     }
 
+    public function test_processing_error_is_preserved_as_assertion_failure(): void
+    {
+        $previous = new \Error('Unable to process response');
+        $auth = Mockery::mock(Auth::class);
+        $auth->expects('processResponse')->with(null)->andThrow($previous);
+        $auth->expects('getErrors')->andReturn(['invalid_response']);
+        $auth->expects('getLastErrorReason')->andReturn('Unable to process response');
+        $auth->shouldNotReceive('isAuthenticated', 'getAttributes');
+
+        try {
+            (new SamlAuth($auth))->getAuthenticatedUser();
+            $this->fail('A processing error must not create a user.');
+        } catch (AssertException $exception) {
+            $this->assertSame($previous, $exception->getPrevious());
+        }
+    }
+
+    public function test_logout_processing_error_is_preserved_and_keeps_request_id(): void
+    {
+        session(['saml.logoutRequestId' => 'logout-request']);
+        $previous = new \TypeError('Unable to process logout');
+        $auth = Mockery::mock(Auth::class);
+        $auth->expects('processSLO')->with(false, 'logout-request', false, Mockery::type('callable'), true)->andThrow($previous);
+        $auth->expects('getErrors')->andReturn(['invalid_logout_response']);
+        $auth->expects('getLastErrorReason')->andReturn('Unable to process logout');
+
+        try {
+            (new SamlAuth($auth))->handleLogoutRequest();
+            $this->fail('A processing error must not complete logout.');
+        } catch (AssertException $exception) {
+            $this->assertSame($previous, $exception->getPrevious());
+            $this->assertSame('logout-request', session('saml.logoutRequestId'));
+        }
+    }
+
     public function test_unauthenticated_response_prevents_user_creation(): void
     {
         $auth = Mockery::mock(Auth::class);
